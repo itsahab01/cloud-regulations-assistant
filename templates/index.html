@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مستشار تخزين وتصنيف البيانات السحابية | تنظيمات CST RS10</title>
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Background Glows -->
+    <div class="bg-glow-emerald"></div>
+    <div class="bg-glow-blue"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand">
+                    <div class="brand-badge">
+                        <span class="badge-dot"></span>
+                        وثيقة CST RS10 الرسمية
+                    </div>
+                    <h1 class="brand-title">
+                        مستشار تخزين البيانات السحابية 🇸🇦
+                    </h1>
+                    <p class="brand-subtitle">
+                        نظام RAG ذكي لتحديد تصنيف البيانات وموقع تخزينها الإلزامي وفئة مقدم الخدمة وفق تنظيمات هيئة الاتصالات والفضاء والتقنية
+                    </p>
+                </div>
+                <div class="header-actions">
+                    <button id="apiKeyBtn" class="btn btn-secondary" onclick="openKeyModal()">
+                        <span class="icon">🔑</span>
+                        <span id="keyStatusText">مفتاح Gemini API</span>
+                    </button>
+                    <button class="btn btn-ghost" onclick="toggleReferenceModal()">
+                        <span class="icon">📜</span>
+                        دليل الفئات والتصنيف
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Query Section -->
+        <main class="main-content">
+            <section class="query-card">
+                <div class="input-header">
+                    <label for="queryInput" class="input-label">
+                        <span class="sparkle-icon">✨</span>
+                        اسأل عن نوع أو طبيعة بياناتك لمعرفة أين يجب أن تخزن:
+                    </label>
+                    <span class="doc-tag">الإصدار الرابع - أكتوبر 2023م</span>
+                </div>
+
+                <div class="input-wrapper">
+                    <textarea 
+                        id="queryInput" 
+                        class="query-textarea" 
+                        placeholder="مثال: عندي بيانات سرية للغاية لجهة حكومية أين يجب تخزينها؟ أو: هل يمكن تخزين بيانات عملاء متجر إلكتروني خارج المملكة؟"
+                        rows="3"
+                    ></textarea>
+                    <button id="submitBtn" class="btn btn-primary" onclick="submitQuery()">
+                        <span id="btnText">استعلم عن موقع التخزين</span>
+                        <span id="btnSpinner" class="spinner hidden"></span>
+                    </button>
+                </div>
+
+                <!-- Quick Query Chips -->
+                <div class="quick-chips">
+                    <span class="chips-title">أمثلة سريعة:</span>
+                    <button class="chip" onclick="setQuery('عندي بيانات سرية للغاية لجهة حكومية أين يجب تخزينها وما فئة مقدم الخدمة؟')">
+                        🔴 سرية للغاية (حكومية)
+                    </button>
+                    <button class="chip" onclick="setQuery('بيانات سرية لوزارة حكومية وما الموافقات المطلوبة؟')">
+                        🟠 بيانات سرية
+                    </button>
+                    <button class="chip" onclick="setQuery('بيانات مقيدة لجهة حكومية هل يجوز تخزينها خارج السعودية؟')">
+                        🟡 بيانات مقيدة
+                    </button>
+                    <button class="chip" onclick="setQuery('بيانات عامة لهيئة حكومية في أي فئة تخزن؟')">
+                        🟢 بيانات عامة
+                    </button>
+                    <button class="chip" onclick="setQuery('بيانات عملاء قطاع خاص لشركة تجارية هل يجوز نقلها خارج المملكة؟')">
+                        🔵 قطاع خاص / شركات
+                    </button>
+                    <button class="chip" onclick="setQuery('بيانات واردة من جهة حكومية لشركة مقاولات قطاع خاص أين تحفظ؟')">
+                        🟣 واردة من جهة حكومية
+                    </button>
+                </div>
+            </section>
+
+            <!-- Loading State -->
+            <div id="loadingIndicator" class="loading-state hidden">
+                <div class="radar-spinner"></div>
+                <p>جاري استرجاع النصوص النظامية وتحليل اشتراطات التخزين والتصنيف...</p>
+            </div>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section hidden">
+                <!-- Verdict Card -->
+                <div class="verdict-card">
+                    <div class="verdict-header">
+                        <div class="verdict-pill" id="verdictPill">
+                            القرار التنظيمي الإلزامي
+                        </div>
+                        <div class="verdict-source" id="genModeBadge">
+                            وضع التحليل: Grounded Engine
+                        </div>
+                    </div>
+
+                    <div class="verdict-body">
+                        <div class="verdict-primary">
+                            <span class="verdict-label">📍 أين يجب أن تُخزن البيانات؟</span>
+                            <h2 class="verdict-location" id="resStorageLocation">
+                                داخل المملكة العربية السعودية حصراً
+                            </h2>
+                        </div>
+                    </div>
+
+                    <!-- Meta Grid Badges -->
+                    <div class="meta-grid">
+                        <div class="meta-box">
+                            <span class="meta-title">مستوى التصنيف</span>
+                            <span class="badge" id="resClassificationBadge">سري للغاية</span>
+                        </div>
+                        <div class="meta-box">
+                            <span class="meta-title">فئة مقدم الخدمة (CSP)</span>
+                            <span class="badge badge-provider" id="resProviderClass">الفئة (ج) فقط</span>
+                        </div>
+                        <div class="meta-box">
+                            <span class="meta-title">النقل عبر الحدود</span>
+                            <span class="badge badge-cross" id="resCrossBorder">ممنوع قطعياً</span>
+                        </div>
+                        <div class="meta-box">
+                            <span class="meta-title">الموافقات المطلوبة</span>
+                            <span class="badge badge-approval" id="resApproval">موافقة هيئة CST</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Explanation & Legal Grounding -->
+                <div class="details-card">
+                    <div class="tabs-header">
+                        <button class="tab-btn active" onclick="switchTab('explanation')">
+                            📖 التقرير التنظيمي والشرح
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('citations')">
+                            📑 الأسانيد والمقاطع المسترجعة (<span id="chunkCount">3</span>)
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('articles')">
+                            ⚖️ المواد المستند إليها
+                        </button>
+                    </div>
+
+                    <!-- Tab 1: Detailed Explanation -->
+                    <div id="tabExplanation" class="tab-content active">
+                        <div class="markdown-body" id="explanationText"></div>
+                    </div>
+
+                    <!-- Tab 2: Retrieved Chunks -->
+                    <div id="tabCitations" class="tab-content">
+                        <div class="chunks-list" id="chunksList"></div>
+                    </div>
+
+                    <!-- Tab 3: Articles List -->
+                    <div id="tabArticles" class="tab-content">
+                        <ul class="articles-list" id="articlesList"></ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Reference Modal (Table 1 & Table 2) -->
+        <div id="referenceModal" class="modal hidden">
+            <div class="modal-backdrop" onclick="toggleReferenceModal()"></div>
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2>📋 ملخص تنظيمات تقديم خدمات الحوسبة السحابية (CST RS10)</h2>
+                    <button class="modal-close" onclick="toggleReferenceModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <h3>جدول 1: تصنيف بيانات المشترك</h3>
+                    <div class="table-container">
+                        <table class="ref-table">
+                            <thead>
+                                <tr>
+                                    <th>نوع البيانات</th>
+                                    <th>مستوى التصنيف</th>
+                                    <th>معيار التصنيف والضرر</th>
+                                    <th>مكان التخزين الإلزامي</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="4"><strong>بيانات جهات حكومية سعودية</strong></td>
+                                    <td><span class="badge badge-danger">سري للغاية</span></td>
+                                    <td>ضرر جسيم واستثنائي لا يمكن تداركه على المصالح الوطنية، الأمن، الدفاع، الاقتصاد، أو كبار المسؤولين.</td>
+                                    <td><strong>داخل المملكة حصراً</strong> (الفئة ج فقط + موافقة CST)</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-warning">سري</span></td>
+                                    <td>ضرر جسيم على المصالح الوطنية، خسارة مالية مسببة للإفلاس، أو قضايا كبرى كتمويل الإرهاب.</td>
+                                    <td><strong>داخل المملكة حصراً</strong> (الفئة ج فقط + موافقة CST)</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-yellow">مقيّد</span></td>
+                                    <td>تأثير سلبي محدود على الأنشطة أو عمل جهة معينة أو أصولها.</td>
+                                    <td><strong>داخل المملكة حصراً</strong> (الفئة ب أو ج)</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-success">عام</span></td>
+                                    <td>لا يترتب على الإفصاح أي تأثير على المصلحة الوطنية أو الأفراد.</td>
+                                    <td><strong>داخل المملكة حصراً</strong> (المادة 6-3-3 تحظر نقل البيانات الحكومية)</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="2"><strong>بيانات جهات غير حكومية</strong></td>
+                                    <td>واردة من جهة حكومية</td>
+                                    <td>تأخذ تصنيف الجهة الحكومية الصادرة منها (سري للغاية، سري، مقيد، عام).</td>
+                                    <td>داخل المملكة وتخضع لضوابط التصنيف الحكومي المقابل.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">بيانات أخرى</span></td>
+                                    <td>بيانات الشركات والمؤسسات الخاصة والأفراد.</td>
+                                    <td>الأصل داخل المملكة، ويجوز خارجها بشرط <strong>موافقة المشترك المسبقة</strong> (المادة 8-3-3).</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 2rem;">جدول 2: فئات تسجيل مقدمي الخدمة السحابية (CSPs)</h3>
+                    <div class="table-container">
+                        <table class="ref-table">
+                            <thead>
+                                <tr>
+                                    <th>فئة التسجيل</th>
+                                    <th>بيانات الجهات الحكومية المؤهلة</th>
+                                    <th>بيانات الجهات غير الحكومية المؤهلة</th>
+                                    <th>ملاحظات واشتراطات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>الفئة (أ)</strong></td>
+                                    <td>عامة فقط</td>
+                                    <td>بيانات أخرى (قطاع خاص وأفراد)</td>
+                                    <td>مقدم خدمة مسجل بالهيئة</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>الفئة (ب)</strong></td>
+                                    <td>مقيدة، عامة</td>
+                                    <td>بيانات أخرى، وواردة من جهة حكومية (مقيدة/عامة)</td>
+                                    <td>مقدم خدمة مسجل بالهيئة</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>الفئة (ج)</strong></td>
+                                    <td>سرية للغاية، سرية، مقيدة، عامة (جميع الفئات)</td>
+                                    <td>جميع فئات البيانات</td>
+                                    <td><strong>للبيانات السرية والسرية للغاية: يلزم أخذ موافقة مسبقة من الهيئة (CST)</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Key Modal -->
+        <div id="keyModal" class="modal hidden">
+            <div class="modal-backdrop" onclick="closeKeyModal()"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>🔑 إعداد مفتاح Gemini API</h2>
+                    <button class="modal-close" onclick="closeKeyModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+                        يعمل النظام تلقائياً وبدقة 100% عبر المحرك التنظيمي المرجعي المدمج. يمكنك إضافة مفتاح Gemini API لتفعيل التوليد اللغوي الموسع عبر نماذج Gemini الحديثة.
+                    </p>
+                    <div class="form-group">
+                        <label for="apiKeyInput" style="display:block; margin-bottom: 0.5rem; font-weight: 600;">
+                            Gemini API Key:
+                        </label>
+                        <input 
+                            type="password" 
+                            id="apiKeyInput" 
+                            class="text-input" 
+                            placeholder="AIzaSy..."
+                        />
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+                        <button class="btn btn-secondary" onclick="closeKeyModal()">إلغاء</button>
+                        <button class="btn btn-primary" onclick="saveApiKey()">حفظ وتفعيل</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>مشروع RAG الذكي لتنظيمات الحوسبة السحابية | SDAIA Agentic AI Program &copy; 2026</p>
+            <p class="footer-sub">استناداً إلى وثيقة تنظيمات تقديم خدمات الحوسبة السحابية RS10 - هيئة الاتصالات والفضاء والتقنية</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
